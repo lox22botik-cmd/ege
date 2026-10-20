@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0f17">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Моя школа ЕГЭ</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div>
+    <div class="brand">Моя школа · ЕГЭ 2027</div>
+    <h1 id="title">Сегодня</h1>
+  </div>
+  <div id="topDetail" class="top-detail"></div>
+</header>
+<main id="view"></main>
+<div id="timer" class="timer hidden">
+  <i class="tdot" id="timerDot"></i>
+  <div class="timer-main">
+    <div class="timer-label" id="timerLabel"></div>
+    <div class="timer-time mono" id="timerTime">0:00</div>
+  </div>
+  <button class="tbtn" id="timerStop">■ Стоп</button>
+</div>
+<nav class="tabs">
+  <a href="#home" data-tab="home"><span>☀️</span>Сегодня</a>
+  <a href="#course" data-tab="course"><span>🎬</span>Курсы</a>
+  <a href="#practice" data-tab="practice"><span>🎯</span>Практика</a>
+  <a href="#stats" data-tab="stats"><span>📈</span>Итоги</a>
+  <a href="#more" data-tab="more"><span>⚙️</span>Ещё</a>
+</nav>
+<div id="tip" class="tip hidden"></div>
+<script src="data.js"></script>
+<script src="core.js"></script>
+<script src="home.js"></script>
+<script src="course.js"></script>
+<script src="practice.js"></script>
+<script src="stats.js"></script>
+<script src="more.js"></script>
+</body>
+</html>
