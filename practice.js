@@ -50,6 +50,8 @@ function taskSheet(subj, n) {
 function testSheet(subj, test) {
   const sb = SUBJECTS[subj], t = test || { date: todayStr(), score: '', max: sb.max, test: '', src: '', wrong: [], full: true };
   openSheet((test ? 'Пробник' : 'Новый пробник') + ' · ' + sb.name, `
+    ${test ? `<div class="muted small">Предмет — записал не туда? Переключи и сохрани</div>
+    <div class="seg" id="teSj">${SUBJ_ORDER.map(k => `<button type="button" data-sj="${k}" class="${k === subj ? 'on' : ''}" style="--c:${SUBJECTS[k].color}">${SUBJECTS[k].name}</button>`).join('')}</div>` : ''}
     <label class="field">Где писал<input id="teS" value="${esc(t.src)}" placeholder="${subj === 'i' ? 'kompege, вариант 12' : 'курс, ФИПИ, школа…'}"></label>
     <div class="two">
       <label class="field">Первичные баллы<input type="number" id="teP" inputmode="numeric" min="0" max="${sb.max}" value="${t.score}"></label>
@@ -61,14 +63,22 @@ function testSheet(subj, test) {
     <label class="field">День<input type="date" id="teD" value="${t.date}" max="${todayStr()}"></label>
     <button class="btn wide" id="teOk">Сохранить</button>
     ${test ? '<button class="btn danger wide" id="teDel">Удалить</button>' : ''}`, b => {
+    let ns = subj;
+    b.querySelectorAll('[data-sj]').forEach(x => x.onclick = () => {
+      const m = b.querySelector('#teM');
+      if (+m.value === SUBJECTS[ns].max) m.value = SUBJECTS[x.dataset.sj].max; // максимум был по умолчанию — ставим максимум нового предмета
+      ns = x.dataset.sj; b.querySelectorAll('[data-sj]').forEach(y => y.classList.toggle('on', y === x));
+    });
     b.querySelector('#teOk').onclick = () => {
+      const sb = SUBJECTS[ns];
       const score = parseInt(b.querySelector('#teP').value), max = parseInt(b.querySelector('#teM').value);
       if (!(score >= 0) || !(max > 0) || score > max) { toast('Укажи баллы: от 0 до максимума'); return; }
       const tv = b.querySelector('#teT').value;
       const wrong = [...new Set((b.querySelector('#teW').value.match(/\d+/g) || []).map(Number).filter(n => n >= 1 && n <= sb.tasks))].sort((a, b) => a - b);
-      const rec = { id: test ? test.id : uid(), subj, date: b.querySelector('#teD').value || todayStr(), src: b.querySelector('#teS').value.trim(), score, max, test: tv === '' ? '' : Math.min(100, parseInt(tv)), wrong, full: b.querySelector('#teF').checked };
+      const rec = { id: test ? test.id : uid(), subj: ns, date: b.querySelector('#teD').value || todayStr(), src: b.querySelector('#teS').value.trim(), score, max, test: tv === '' ? '' : Math.min(100, parseInt(tv)), wrong, full: b.querySelector('#teF').checked };
       S.tests = S.tests.filter(x => x.id !== rec.id).concat(rec);
-      save(); closeSheet(); render(); toast('Пробник сохранён');
+      if (ns !== subj) S.ui.prac = ns;
+      save(); closeSheet(); render(); toast(ns !== subj ? 'Пробник перенесён: ' + sb.name : 'Пробник сохранён');
     };
     const d = b.querySelector('#teDel');
     if (d) d.onclick = () => { if (!confirm('Удалить пробник?')) return; S.tests = S.tests.filter(x => x.id !== test.id); save(); closeSheet(); render(); };
