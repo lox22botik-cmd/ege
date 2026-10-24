@@ -1,0 +1,9 @@
+{
+  "api_id": 0,
+  "api_hash": "ВПИШИ_С_my.telegram.org",
+  "limit": 1000,
+  "channels": [
+    { "subj": "m", "chat": "ЕГЭ мат проф" },
+    { "subj": "r", "chat": "@канал_или_название_русского" }
+  ]
+}

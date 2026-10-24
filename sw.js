@@ -1,6 +1,6 @@
 // Офлайн-кэш. При изменении файлов приложения — поднять версию.
-const CACHE = 'ege-v1';
-const FILES = ['./', 'index.html', 'style.css', 'data.js', 'core.js', 'home.js', 'course.js', 'practice.js', 'stats.js', 'more.js', 'manifest.webmanifest', 'icon.svg'];
+const CACHE = 'ege-v4';
+const FILES = ['./', 'index.html', 'style.css', 'data.js', 'core.js', 'home.js', 'course.js', 'practice.js', 'stats.js', 'more.js', 'bg.js', 'fx.js', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

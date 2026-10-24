@@ -15,6 +15,21 @@ VIEWS.more = () => ({
   </section>
 
   <section class="card">
+    <div class="card-title">📡 Видео, ДЗ и файлы из Телеграма</div>
+    ${TG ? `<div class="muted small">Подключено · обновлено ${esc(TG.synced)} · постов: ${TG.posts.length} (ДЗ: ${TG.posts.filter(p => p.hw).length}). Новое подтягивается само каждые 30 минут, если один раз запущен <b class="txt">tg-auto-on.bat</b>; страница обновится сама. Вручную — <b class="txt">tg-sync.bat</b>.</div>`
+      : `<div class="muted small">Скрипт берёт из каналов курса ссылки на видео, файлы с уроков, ДЗ и посты со ссылками — сами видео и файлы остаются в Телеграме. Ключи и вход хранятся только на этом компьютере.</div>
+    <ol class="steps">
+      <li>Запусти <code>tg-setup.bat</code> в папке приложения (один раз).</li>
+      <li>На <a href="https://my.telegram.org" target="_blank" rel="noopener">my.telegram.org</a> → API development tools получи <b>api_id</b> и <b>api_hash</b>, впиши в <code>tg\\config.json</code>.</li>
+      <li>Запусти <code>tg-chats.bat</code> — войди (телефон и код из Телеграма) и посмотри список каналов.</li>
+      <li>Впиши каналы курсов в <code>config.json</code> — можно просто названием, например <code>"ЕГЭ мат проф"</code> (<code>"m"</code> — математика, <code>"r"</code> — русский).</li>
+      <li>Запусти <code>tg-sync.bat</code> — появятся первые посты.</li>
+      <li>Запусти <code>tg-auto-on.bat</code> — дальше всё будет приходить само каждые 30 минут.</li>
+    </ol>`}
+    <div class="muted small">Не выходит получить api_id? В Телеграме для ПК: канал → ⋮ → «Экспорт истории» → формат JSON, галочку «Видео» снять, «Файлы» оставить — тогда ДЗ и конспекты откроются прямо отсюда. Потом запусти <code>tg-import.bat</code>. Повторяй, когда выходят новые уроки.</div>
+  </section>
+
+  <section class="card">
     <div class="card-title">Резервная копия</div>
     <div class="muted small">Всё хранится только в этом браузере. Раз в неделю сохраняй файл — если почистишь браузер, ничего не пропадёт.</div>
     <div class="btn-row"><button class="btn ghost" id="mExp">⬇ Сохранить файл</button><button class="btn ghost" id="mImp">⬆ Загрузить</button></div>

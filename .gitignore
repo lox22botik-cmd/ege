@@ -1,0 +1,10 @@
+# Доступ к Телеграм-аккаунту и ключи — никогда не коммитить
+tg/config.json
+tg/*.session
+tg/*.session-journal
+tg/.venv/
+# Выгрузка из каналов — личные данные
+tg-data.js
+__pycache__/
+tg/sync.log
+tg-files/

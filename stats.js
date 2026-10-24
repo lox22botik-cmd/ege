@@ -58,6 +58,19 @@ function testsChart(subj) {
   return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Результаты пробников: ${SUBJECTS[subj].name}">${g}</svg>`;
 }
 
+// ДЗ: точность по предметам и список номеров с ошибками — по нему повторение перед стримом
+function hwCard() {
+  const rows = allLessons().map(l => ({ l, s: st(l.id) })).filter(x => x.s.hwN);
+  if (!rows.length) return `<section class="card"><div class="card-title">Домашки</div><div class="empty">Когда проверим первое ДЗ, впиши в карточке урока, сколько было заданий и сколько верно — здесь появится точность и список ошибок</div></section>`;
+  const bySubj = ['m', 'r'].map(k => { const r = rows.filter(x => x.l.subj === k); return { k, n: sum(r.map(x => x.s.hwN)), ok: sum(r.map(x => x.s.hwOk)), cnt: r.length }; }).filter(x => x.cnt);
+  const errs = rows.filter(x => x.s.hwErr || x.s.hwOk < x.s.hwN);
+  return `<section class="card">
+      <div class="card-title">Домашки</div>
+      <div class="kpis two">${bySubj.map(x => `<div><b class="mono">${pct(x.ok, x.n)}%</b><span>${dot(x.k)}${SUBJECTS[x.k].name}: верно ${x.ok} из ${x.n} · ДЗ ${x.cnt}</span></div>`).join('')}</div>
+      ${errs.length ? `<div class="sm-title">Где были ошибки · ${errs.length}</div>${errs.map(x => `<button class="hwerr" data-open="${x.l.id}"><span>${dot(x.l.subj)}${esc(x.l.title)}</span><b class="mono">${x.s.hwOk}/${x.s.hwN}</b>${x.s.hwErr ? `<small class="muted">ошибки: ${esc(x.s.hwErr)}</small>` : ''}</button>`).join('')}` : '<div class="ok-t small">Ошибок нет — всё верно</div>'}
+    </section>`;
+}
+
 VIEWS.stats = () => {
   const t = todayStr(), range = S.ui.range || 28;
   const days = Array.from({ length: range }, (_, i) => addDays(t, i - range + 1));
@@ -98,12 +111,15 @@ VIEWS.stats = () => {
       }).join('')}
     </section>
 
+    ${hwCard()}
+
     <section class="card">
       <div class="card-title">Пробники · % от первичного максимума</div>
       ${subjWithTests.length ? subjWithTests.map(k => `<div class="sm-title">${dot(k)}${SUBJECTS[k].name}</div>${testsChart(k)}`).join('') : '<div class="empty">Запиши первый пробник во вкладке «Практика» — здесь появится график роста</div>'}
     </section>`,
     mount: root => {
       root.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { S.ui.range = +b.dataset.r; save(); render(); });
+      root.querySelectorAll('[data-open]').forEach(b => b.onclick = () => lessonSheet(b.dataset.open));
     },
   };
 };
