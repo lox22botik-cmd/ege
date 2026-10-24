@@ -418,6 +418,7 @@ function summarySheet(pre) {
       const rec = { id: uid(), date: todayStr(), subj: x ? (x.l ? x.l.subj : x.subj) : s, min, what: what + (note ? ' — ' + note : '') };
       if (x && x.l) rec.lesson = x.l.id;
       if (x && !x.l) rec.plan = x.t;
+      if (x && x.ahead) rec.planDay = x.ahead; // пункт завтрашнего плана, сделанный заранее
       S.sessions.push(rec);
       if (x && x.l) {
         if (b.querySelector('#smD').checked && !isWatched(x.l)) setWatched(x.l.id, true);
@@ -436,7 +437,7 @@ function summarySheet(pre) {
   });
 }
 // Пункт плана текстом (пробник, инфа) сделан, если по нему записан итог в этот день
-const planTextDone = (x, date) => S.sessions.some(s => s.plan === x.t && s.subj === x.subj && s.date === date);
+const planTextDone = (x, date) => S.sessions.some(s => s.plan === x.t && s.subj === x.subj && (s.date === date || s.planDay === date));
 
 // ---------- шапка и боковая панель: данные справа от названия и под меню ----------
 function renderTop() {

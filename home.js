@@ -37,7 +37,7 @@ function planCard(x, date, i) {
       <div class="pc-side"><b class="mono">≈${hstr(h)} ч</b>${ask}<button class="pc-act" data-sum="${x.l.id}">${IC.pen}Итог</button></div>
     </div>`;
   }
-  const k = planDay(date).filter(y => !y.l).indexOf(x);
+  const k = planDay(date).filter(y => !y.l).findIndex(y => y.t === x.t && y.subj === x.subj); // planDay каждый раз строит новые объекты
   return `<div class="pcard txt${done ? ' done' : ''}" style="--c:${SUBJECTS[subj].color};--i:${i}">
     <span class="pc-check static">${done ? IC.check : IC.flag}</span>
     <div class="pc-main"><span class="pc-subj">${SUBJECTS[subj].name}${/пробник/i.test(x.t) ? '<i>·</i>контрольная точка' : ''}</span><span class="pc-title">${esc(x.t)}</span></div>
@@ -235,7 +235,7 @@ VIEWS.home = () => {
   const tail = [];
   for (let d = addDays(t, -1); planDay(d).length; d = addDays(d, -1))
     for (const x of planDay(d)) if (x.l && !x.opt && !isWatched(x.l) && !tail.some(y => y.l === x.l)) tail.unshift(x);
-  const tomorrow = planDay(addDays(t, 1));
+  const tm = addDays(t, 1), tomorrow = planDay(tm);
   const doneN = planReal.filter(x => itemDone(x, t)).length;
   const planH = planHrsOf(plan), doneMin = minutesOn(t);
   const goalMin = planH ? planH * 60 : S.settings.goal;
@@ -291,7 +291,10 @@ VIEWS.home = () => {
       ${tail.length ? `<div class="sub-h warn-t">Хвост с прошлых дней · ${tail.length}</div>${tail.map((x, i) => planCard(x, t, i)).join('')}<div class="sub-h">Сегодня</div>` : ''}
       ${plan.length ? plan.map((x, i) => planCard(x, t, i + tail.length)).join('') : '<div class="empty">На сегодня в плане пусто — хороший день, чтобы закрыть ошибки из ДЗ</div>'}
       ${todayNew.length ? `<div class="sub-h">Вышло сегодня в курсе — посмотришь по плану позже</div><div class="lessons">${todayNew.map(l => lessonRow(l, true)).join('')}</div>` : ''}
-      ${tomorrow.length ? `<div class="plan-next"><span class="muted">Завтра · ≈${hstr(planHrsOf(tomorrow))} ч</span>${tomorrow.map(x => `<span class="nx" style="--c:${SUBJECTS[x.l ? x.l.subj : x.subj].color}">${esc(x.l ? x.l.title : x.t.replace(/\s*\(.*$/, ''))}</span>`).join('')}</div>` : ''}
+      ${allDone && tomorrow.length ? `<div class="ahead">
+        <div class="ahead-h"><b>Есть силы? Можно начать завтрашнее</b><span class="muted small">${fmtShort(tm)} · ≈${hstr(planHrsOf(tomorrow))} ч · сделаешь сегодня — завтра этот пункт уже будет закрыт</span></div>
+        ${tomorrow.map((x, i) => planCard(x, tm, i).replace('data-sumt=', 'data-sumtm=')).join('')}</div>`
+      : tomorrow.length ? `<div class="plan-next"><span class="muted">Завтра · ≈${hstr(planHrsOf(tomorrow))} ч</span>${tomorrow.map(x => `<span class="nx" style="--c:${SUBJECTS[x.l ? x.l.subj : x.subj].color}">${esc(x.l ? x.l.title : x.t.replace(/\s*\(.*$/, ''))}</span>`).join('')}</div>` : ''}
     </section>
     <section class="card span4 courses">
       <div class="card-title">Курсы</div>
@@ -321,6 +324,7 @@ VIEWS.home = () => {
     mount: root => {
       root.querySelector('#sumBtn').onclick = () => summarySheet();
       root.querySelectorAll('[data-sumt]').forEach(b => b.onclick = () => summarySheet(plan.filter(x => !x.l)[+b.dataset.sumt]));
+      root.querySelectorAll('[data-sumtm]').forEach(b => b.onclick = () => summarySheet({ ...tomorrow.filter(x => !x.l)[+b.dataset.sumtm], ahead: tm }));
       root.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
         if (!confirm('Удалить запись?')) return;
         S.sessions = S.sessions.filter(s => s.id !== b.dataset.del); save(); render();

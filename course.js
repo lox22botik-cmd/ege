@@ -7,6 +7,7 @@ function lessonBadges(l) {
   else if (!isWatched(l) && l.date === todayStr()) out.push('<span class="pill now">сегодня</span>');
   if (s.hw === 'todo') out.push('<span class="pill warn">ДЗ</span>');
   if (s.hw === 'done') out.push(`<span class="pill ok">ДЗ${s.hwN ? ' ' + s.hwOk + '/' + s.hwN : s.hwP != null ? ' ' + s.hwP + '%' : ' ✓'}</span>`);
+  if (s.prN) out.push(`<span class="pill ${s.prD >= s.prN ? 'ok' : 'warn'}">прорешка ${s.prD || 0}/${s.prN}</span>`);
   return out.join('');
 }
 // Строка урока. withSubj — показать предмет (на «Сегодня»)
@@ -54,6 +55,13 @@ function lessonSheet(id) {
       <button class="btn ghost" id="lsT">Записать итог занятия</button>
     </div>
     ${tgHtml}
+    <h4>Прорешка</h4>
+    <div class="row2">
+      <label class="field">Задач на прорешку<input type="number" id="lsPN" inputmode="numeric" min="0" max="500" value="${s.prN || ''}" placeholder="30"></label>
+      <label class="field">Прорешал<input type="number" id="lsPD" inputmode="numeric" min="0" max="500" value="${s.prN ? s.prD || 0 : ''}" placeholder="0"></label>
+    </div>
+    <div class="chips pr-quick">${['1', '5', '10'].map(k => `<button type="button" class="chip" data-pa="${k}">+${k}</button>`).join('')}<button type="button" class="chip" data-pa="all">Все решил</button></div>
+    <div id="lsPBar">${s.prN ? bar(pct(s.prD || 0, s.prN), SUBJECTS[l.subj].color) : ''}</div>
     <h4>Домашнее задание</h4>
     ${hwPosts.map(f => postLinks(f, '📝')).join('')}
     <div class="seg" id="lsH">
@@ -76,6 +84,16 @@ function lessonSheet(id) {
     b.querySelector('#lsW').onclick = () => { setWatched(id, !w); closeSheet(); render(); };
     b.querySelector('#lsCopy').onclick = () => copyPrompt({ l });
     bindCheckLine(b, { line: '#lsLine', n: '#lsHN', ok: '#lsHOk', err: '#lsHErr' });
+    // Прорешка: кнопки двигают «прорешал», полоса обновляется сразу, запись — по «Сохранить»
+    const pN = b.querySelector('#lsPN'), pD = b.querySelector('#lsPD');
+    const pBar = () => { const n = parseInt(pN.value), d = parseInt(pD.value) || 0; b.querySelector('#lsPBar').innerHTML = n > 0 ? bar(pct(Math.min(d, n), n), SUBJECTS[l.subj].color) : ''; };
+    pN.oninput = pD.oninput = pBar;
+    b.querySelectorAll('[data-pa]').forEach(x => x.onclick = () => {
+      const n = parseInt(pN.value);
+      if (!(n > 0)) { toast('Сначала впиши, сколько задач на прорешку'); pN.focus(); return; }
+      pD.value = x.dataset.pa === 'all' ? n : Math.min(n, (parseInt(pD.value) || 0) + +x.dataset.pa);
+      pBar();
+    });
     const tb = b.querySelector('#lsT');
     if (tb) tb.onclick = () => { closeSheet(); summarySheet({ l }); };
     const vs = b.querySelector('#lsV');
@@ -96,6 +114,9 @@ function lessonSheet(id) {
       x.hwErr = b.querySelector('#lsHErr').value.trim();
       if (!x.hwErr) delete x.hwErr;
       x.note = b.querySelector('#lsN').value.trim();
+      const prN = parseInt(pN.value);
+      if (prN > 0) { x.prN = prN; x.prD = Math.min(prN, Math.max(0, parseInt(pD.value) || 0)); }
+      else { delete x.prN; delete x.prD; }
       save(); closeSheet(); render();
     };
     const del = b.querySelector('#lsDel');
@@ -150,6 +171,7 @@ VIEWS.course = () => {
   const out = ls.filter(l => l.date <= t), watched = ls.filter(isWatched), debt = ls.filter(isDebt);
   const hwT = ls.filter(hwDebt).length, hwD = ls.filter(l => st(l.id).hw === 'done');
   const hwPs = hwD.map(l => st(l.id).hwP).filter(x => x != null);
+  const prL = ls.filter(l => st(l.id).prN), prAll = sum(prL.map(l => st(l.id).prN)), prDone = sum(prL.map(l => st(l.id).prD || 0));
   const shown = f === 'debt' ? ls.filter(l => isDebt(l) || hwDebt(l)) : f === 'next' ? ls.filter(l => l.date >= t) : ls;
   const blocks = [...new Set(shown.map(l => l.block))];
   const unl = tgUnlinked(subj), linked = ls.filter(l => videoOf(l)).length;
@@ -174,6 +196,7 @@ VIEWS.course = () => {
         <div><b class="mono">${hwPs.length ? Math.round(sum(hwPs) / hwPs.length) + '%' : '—'}</b><span>средний % за ДЗ</span></div>
       </div>
       ${bar(pct(watched.length, out.length), SUBJECTS[subj].color)}
+      ${prL.length ? `<div class="muted small" style="margin-top:8px">Прорешка: <b class="txt">${prDone} из ${prAll}</b> ${plural(prAll, 'задачи', 'задач', 'задач')} · ${pct(prDone, prAll)}% · по ${prL.length} ${plural(prL.length, 'уроку', 'урокам', 'урокам')}</div>` : ''}
     </section>
     ${tgCard}
     <div class="chips filt">${[['all', 'Все'], ['debt', 'Долги'], ['next', 'Впереди']].map(([k, n]) => `<button class="chip${k === f ? ' on' : ''}" data-f="${k}">${n}</button>`).join('')}</div>

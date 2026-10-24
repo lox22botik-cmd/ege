@@ -601,3 +601,9 @@ body.cur-on .cur-ring, body.cur-on .cur-dot { opacity: 1; }
 .ns-btns { display: flex; gap: 10px; margin-top: auto; padding-top: 16px; }
 .ns-btns .btn { flex: 1; }
 .w-next2.done .ns-title { background: linear-gradient(90deg, #a6f0cf, var(--ok)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Завтрашний план, когда сегодняшний закрыт */
+.ahead { margin-top: 16px; padding: 14px 14px 4px; border: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.ahead-h { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; }
+.ahead-h b { font-size: 16px; }
+.pr-quick { margin: 2px 0 10px; }
