@@ -57,6 +57,8 @@ if (!S.fix25) {
     S.tests.push({ id: 'start-r', subj: 'r', date: '2026-10-25', src: 'Демоверсия ЕГЭ-2027, старт (без сочинения)', score: 13, max: 59, test: '', wrong: [], full: false });
   S.fix25 = 1; save();
 }
+// 25.10: паронимы (рус 16.09) не пройдены — снять старую стартовую отметку (свою отметку не трогаем)
+if (!S.fix25b) { const l = S.les['r-2026-09-16']; if (l && l.hw === 'old') delete S.les['r-2026-09-16']; S.fix25b = 1; save(); }
 let saveWarned = false;
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(S)); }
