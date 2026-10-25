@@ -59,6 +59,11 @@ h1 span { background: var(--grad); -webkit-background-clip: text; background-cli
 .body { font: 500 19px/1.7 var(--serif); margin-bottom: 16px; }
 .body p { margin: 0 0 10px; }
 .body .gap { font-family: Manrope, sans-serif; font-weight: 800; color: var(--gold); font-size: 15px; }
+.m8 { display: grid; grid-template-columns: 1fr 1.4fr; gap: 22px; font-size: 17px; line-height: 1.5; }
+.m8 > div:first-child { font: 600 15px/1.5 Manrope, sans-serif; color: var(--text2); }
+.m8 p { margin: 0 0 9px; }
+.tlist p { margin: 0 0 8px; }
+.tlist b { font-family: Manrope, sans-serif; color: var(--gold); margin-right: 4px; }
 .opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
 .opt { display: flex; gap: 12px; align-items: baseline; text-align: left; padding: 12px 16px; border-radius: 14px; border: 2px solid var(--line2); background: var(--card2); font: 500 19px/1.5 var(--serif); }
 .opt .n { font: 800 15px Manrope, sans-serif; color: var(--muted); flex: none; width: 22px; }
@@ -98,6 +103,7 @@ footer button { background: none; border: 0; color: var(--text2); text-decoratio
   .card { padding: 16px; }
   .body, .opt { font-size: 17px; }
   .q { font-size: 16px; }
+  .m8 { grid-template-columns: 1fr; gap: 10px; }
 }
 </style>
 </head>
@@ -164,6 +170,16 @@ function rowsGen({ seed, data, len, n, q, groups }) {
   return out;
 }
 
+// №17–20: цифры в предложении. {+} — здесь нужна запятая, {-} — не нужна
+function numGen({ data, q }) {
+  return data.map(s => {
+    let i = 0; const ans = [];
+    const h = s.replace(/\{([+-])\}/g, (m, c) => { i++; if (c === '+') ans.push(i); return `<span class="gap">(${i})</span>`; });
+    const fill = s.replace(/\s*\{\+\}/g, ',').replace(/\s*\{-\}/g, '');
+    return { q, body: `<p>${h}</p>`, ans: ans.join(''), why: 'Правильно: ' + fill };
+  });
+}
+
 // ---------- состояние ----------
 const KEY = 'proreshka-v1';
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -183,6 +199,15 @@ function numStat(n) { const r = S.d[n] || {}, v = Object.values(r); return { sol
 // ---------- проверка ответа ----------
 const clean = s => String(s).toLowerCase().replace(/ё/g, 'е').replace(/[\s,.;]/g, '');
 const ansOf = t => t.ans != null ? String(t.ans) : t.opts.map((o, i) => o.ok ? i + 1 : '').join('');
+// баллы как на ЕГЭ: 8 и 22 — до 2 баллов (1 балл, если ошибка в одной-двух позициях), остальные — 1
+const maxOf = t => t.max || 1;
+function score(t, a) {
+  if (maxOf(t) === 1) return isRight(t, a) ? 1 : 0;
+  const e = clean(ansOf(t)), x = clean(a);
+  if (x.length !== e.length) return 0;
+  const miss = [...e].filter((c, i) => x[i] !== c).length;
+  return miss === 0 ? 2 : miss <= 2 ? 1 : 0;
+}
 function isRight(t, a) {
   if (t.kind === 'word') return [t.ans, ...(t.alt || [])].some(x => clean(x) === clean(a));
   if (t.kind === 'seq') return clean(a) === clean(ansOf(t));
@@ -202,7 +227,7 @@ function drawHome() {
   $('#app').innerHTML = `<div class="big">
       <div class="card"><div class="ct">Вариант целиком <span>по одному заданию каждого готового номера, проверка в конце</span></div>
         <div class="btns l" style="margin:0"><button class="btn" data-go="var">Решать вариант (${ready.length} ${plural(ready.length, 'задание', 'задания', 'заданий')})</button></div>
-        ${lastVar ? `<div class="hint" style="margin-top:10px">Последний: ${lastVar.ok} из ${lastVar.n} · ${new Date(lastVar.d + 'T12:00').toLocaleDateString('ru')}</div>` : ''}</div>
+        ${lastVar ? `<div class="hint" style="margin-top:10px">Последний: ${lastVar.ok} из ${lastVar.n}${lastVar.maxPts ? ` · ${lastVar.pts} из ${lastVar.maxPts} перв. баллов` : ''} · ${new Date(lastVar.d + 'T12:00').toLocaleDateString('ru')}</div>` : ''}</div>
       <div class="card"><div class="ct">Слабые места</div>${weakest()}</div>
     </div>
     <div class="nums">${Object.keys(NAMES).map(Number).map(n => {
@@ -232,7 +257,7 @@ function drawBank(n) {
 
 // ---------- решение: серия заданий (из банка или вариант) ----------
 let P = null;
-function startRun(items, mode) { if (!items.length) return toast('Нечего решать'); P = { items, mode, i: 0, sel: new Set(), done: false, res: [], ans: [] }; drawTask(); }
+function startRun(items, mode) { if (!items.length) return toast('Нечего решать'); P = { items, mode, i: 0, sel: new Set(), done: false, res: [], ans: [], pts: [] }; drawTask(); }
 const cur = () => P.items[P.i];
 function drawTask() {
   if (P.i >= P.items.length) return drawEnd();
@@ -248,7 +273,7 @@ function drawTask() {
     <div class="q"><b class="no">${n}</b>${t.q}</div>
     ${t.body ? `<div class="body">${t.body}</div>` : ''}${opts}
     <div class="ans">Ответ: <input id="ai" autocomplete="off" spellcheck="false" ${t.kind === 'word' ? '' : 'inputmode="numeric"'} value="${a}" ${P.done ? 'disabled' : ''}></div>
-    ${P.done ? `<div class="fb ${P.res[P.i] ? 'ok' : 'bad'}">${P.res[P.i] ? 'Верно — балл!' : `Неверно. Правильный ответ: ${ansText(t)}`}${t.why ? `<div class="ex">${t.why}</div>` : ''}</div>
+    ${P.done ? `<div class="fb ${P.res[P.i] ? 'ok' : 'bad'}">${P.res[P.i] ? (maxOf(t) > 1 ? 'Верно — 2 балла!' : 'Верно — балл!') : `${P.pts[P.i] ? `Частично: 1 балл из 2.` : 'Неверно.'} Правильный ответ: ${ansText(t)}`}${t.why ? `<div class="ex">${t.why}</div>` : ''}</div>
       <div class="btns"><button class="btn" id="nx">${P.i + 1 < P.items.length ? 'Дальше →' : 'Готово'}</button><button class="btn ghost" data-go="t${n}">К банку №${n}</button></div>`
       : `<div class="btns"><button class="btn" id="ck">${isVar ? (P.i + 1 < P.items.length ? 'Ответить →' : 'Завершить вариант') : 'Проверить'}</button>${isVar && P.i ? '<button class="btn ghost" id="pv">← Назад</button>' : ''}</div>
       <div class="hint center" style="margin-top:10px">${t.opts ? 'нажимай на варианты или вводи цифры · ' : ''}Enter — ${isVar ? 'ответить' : 'проверить'}</div>`}</div>`;
@@ -258,8 +283,9 @@ const ansText = t => t.kind === 'word' ? [t.ans, ...(t.alt || [])].map(x => x.to
 function check() {
   const { n, k } = cur(), t = bank(n)[k - 1], a = $('#ai').value.trim();
   if (!a && !confirm('Ответ пустой. Засчитать как пропуск?')) return;
-  const ok = isRight(t, a), prev = rec(n)[k];
+  const pts = score(t, a), ok = pts === maxOf(t), prev = rec(n)[k];
   rec(n)[k] = { ok: ok ? 1 : 0, a, c: (prev ? prev.c : 0) + 1, d: today() };
+  P.pts[P.i] = pts;
   S.days[today()] = (S.days[today()] || 0) + 1;
   P.res[P.i] = ok; P.ans[P.i] = a; save(); renderHs();
   if (P.mode === 'var') { P.i++; P.sel = new Set(); drawTask(); } else { P.done = true; drawTask(); }
@@ -268,14 +294,15 @@ function next() { P.i++; P.sel = new Set(); P.done = false; P.items.length === 1
 const cur0 = () => P.items[0];
 function drawEnd() {
   const ok = P.res.filter(Boolean).length, n = P.items.length;
-  if (P.mode === 'var' && !P.saved) { S.vars.push({ d: today(), ok, n }); P.saved = 1; save(); }
-  $('#app').innerHTML = `<div class="card task"><div class="hint center">${P.mode === 'var' ? 'Вариант решён' : 'Серия решена'}</div><div class="res">${ok} / ${n}</div>
+  const pts = P.pts.reduce((s, x) => s + (x || 0), 0), maxPts = P.items.reduce((s, { n, k }) => s + maxOf(bank(n)[k - 1]), 0);
+  if (P.mode === 'var' && !P.saved) { S.vars.push({ d: today(), ok, n, pts, maxPts }); P.saved = 1; save(); }
+  $('#app').innerHTML = `<div class="card task"><div class="hint center">${P.mode === 'var' ? 'Вариант решён' : 'Серия решена'}</div><div class="res">${ok} / ${n}</div>${P.mode === 'var' ? `<div class="hint center">первичных баллов: <b style="color:var(--text)">${pts} из ${maxPts}</b> (за часть 1 на ЕГЭ максимум 28)</div>` : ''}
     <div class="hint center" style="margin-top:6px">${ok === n ? 'Всё на балл 🎉' : 'Нажми «разбор», чтобы открыть задание с объяснением'}</div>
     <div class="rev">${P.items.map(({ n, k }, i) => { const t = bank(n)[k - 1]; return `<div class="${P.res[i] ? '' : 'bad'}"><b>№${n}</b> твой ответ: <code>${P.ans[i] || '—'}</code>${P.res[i] ? ' ✓' : ` · верный: <code>${ansText(t)}</code>`}<button data-rv="${i}">разбор</button></div>`; }).join('')}</div>
     <div class="btns">${P.mode === 'var' ? '<button class="btn" data-go="var">Новый вариант</button>' : ''}<button class="btn ghost" data-go="">Все номера</button></div></div>`;
 }
 // разбор задания из итогов варианта
-function review(i) { const it = P.items[i]; const keep = P; P = { items: [it], mode: 'rev', i: 0, sel: new Set([...(keep.ans[i] || '')].map(Number).filter(Boolean)), done: true, res: [keep.res[i]], ans: [keep.ans[i] || ''], back: keep }; drawTask(); $('#nx').textContent = '← К итогам'; }
+function review(i) { const it = P.items[i]; const keep = P; P = { items: [it], mode: 'rev', i: 0, sel: new Set([...(keep.ans[i] || '')].map(Number).filter(Boolean)), done: true, res: [keep.res[i]], ans: [keep.ans[i] || ''], pts: [keep.pts[i]], back: keep }; drawTask(); $('#nx').textContent = '← К итогам'; }
 
 function startVar() {
   const r = Math.random, items = Object.keys(T).map(Number).sort((a, b) => a - b).map(n => { const B = bank(n), r0 = S.d[n] || {}, fresh = B.map((_, i) => i + 1).filter(k => !r0[k]); const pool = fresh.length ? fresh : B.map((_, i) => i + 1); return { n, k: pool[Math.floor(r() * pool.length)] }; });
@@ -322,6 +349,9 @@ $('#impf').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text
 </script>
 <script src="tasks/t04.js"></script>
 <script src="tasks/t05.js"></script>
+<script src="tasks/t06.js"></script>
+<script src="tasks/t07.js"></script>
+<script src="tasks/t08.js"></script>
 <script src="tasks/t09.js"></script>
 <script src="tasks/t10.js"></script>
 <script src="tasks/t11.js"></script>
@@ -329,6 +359,12 @@ $('#impf').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text
 <script src="tasks/t13.js"></script>
 <script src="tasks/t14.js"></script>
 <script src="tasks/t15.js"></script>
+<script src="tasks/t16.js"></script>
+<script src="tasks/t17.js"></script>
+<script src="tasks/t18.js"></script>
+<script src="tasks/t19.js"></script>
+<script src="tasks/t20.js"></script>
+<script src="tasks/t21.js"></script>
 <script>route();</script>
 </body>
 </html>
