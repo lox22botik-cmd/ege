@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Прорешка ЕГЭ — русский язык</title>
+<link rel="icon" href="../icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #0a0c15; --card: #131720; --card2: #1a1f2b; --card3: #242a38; --line: rgba(255,255,255,.08); --line2: rgba(255,255,255,.14); --text: #eef1f7; --text2: #b9c0d0; --muted: #7d869a; --accent: #9d8cff; --rose: #ee8fb0; --gold: #f3cf7a; --ok: #5fd3a2; --bad: #ef6b6b; --grad: linear-gradient(120deg, #9d8cff, #ee8fb0 55%, #f3a683); --serif: Lora, Georgia, serif; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+body { font: 16px/1.5 Manrope, system-ui, 'Segoe UI', sans-serif; min-height: 100vh; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
+.wrap { max-width: 1100px; margin: 0 auto; padding: 22px 20px 60px; }
+header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+.back { text-decoration: none; color: var(--text2); font-weight: 700; border: 1px solid var(--line2); border-radius: 12px; padding: 8px 14px; }
+.back:hover { color: var(--text); border-color: var(--accent); }
+h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
+h1 span { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hstat { margin-left: auto; display: flex; gap: 18px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 10px 18px; }
+.hstat div { display: flex; flex-direction: column; line-height: 1.2; }
+.hstat b { font-size: 20px; } .hstat span { font-size: 13px; color: var(--muted); font-weight: 600; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; }
+.ct { font-weight: 800; font-size: 18px; margin-bottom: 14px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.ct span { font-weight: 600; font-size: 14px; color: var(--muted); }
+.nums { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.num { text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; transition: border-color .15s, transform .15s; }
+.num:hover:not(.off) { border-color: var(--accent); transform: translateY(-2px); }
+.num .n { font-size: 26px; font-weight: 800; line-height: 1; }
+.num .t { font-weight: 700; font-size: 15px; color: var(--text2); }
+.num small { color: var(--muted); font-weight: 600; font-size: 13px; }
+.num .bar { height: 5px; border-radius: 3px; background: var(--card3); overflow: hidden; margin-top: 6px; display: flex; }
+.num .bar i { display: block; height: 100%; }
+.num.off { opacity: .45; cursor: default; }
+.big { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+.big .card { flex: 1 1 240px; }
+.kpi b { font-size: 30px; font-weight: 800; display: block; } .kpi span { color: var(--muted); font-weight: 600; font-size: 14px; }
+.btn { border: 0; background: var(--grad); color: #14121f; padding: 12px 22px; border-radius: 13px; font-weight: 800; font-size: 16px; }
+.btn.ghost { background: var(--card2); color: var(--text); border: 1px solid var(--line2); }
+.btn.red { background: var(--bad); color: #1a0d0d; }
+.btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 18px; }
+.btns.l { justify-content: flex-start; margin: 0 0 16px; }
+.bank { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 6px; }
+.bank button { border: 1px solid var(--line2); background: var(--card2); border-radius: 10px; padding: 9px 0; font-weight: 700; font-size: 15px; color: var(--text2); }
+.bank button:hover { border-color: var(--accent); }
+.bank button.ok { background: rgba(95,211,162,.14); border-color: var(--ok); color: var(--ok); }
+.bank button.bad { background: rgba(239,107,107,.14); border-color: var(--bad); color: var(--bad); }
+.hint { color: var(--muted); font-size: 14px; font-weight: 600; }
+.task { max-width: 760px; margin: 0 auto; }
+.prog { display: flex; gap: 4px; margin-bottom: 16px; }
+.prog i { flex: 1; height: 6px; border-radius: 3px; background: var(--card3); }
+.prog i.done { background: var(--accent); } .prog i.ok { background: var(--ok); } .prog i.bad { background: var(--bad); } .prog i.cur { background: var(--text2); }
+.q { font-size: 18px; font-weight: 700; line-height: 1.5; margin: 8px 0 16px; }
+.q b.no { display: inline-block; background: var(--grad); color: #14121f; border-radius: 8px; padding: 0 9px; margin-right: 8px; }
+.body { font: 500 19px/1.7 var(--serif); margin-bottom: 16px; }
+.body p { margin: 0 0 10px; }
+.body .gap { font-family: Manrope, sans-serif; font-weight: 800; color: var(--gold); font-size: 15px; }
+.opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.opt { display: flex; gap: 12px; align-items: baseline; text-align: left; padding: 12px 16px; border-radius: 14px; border: 2px solid var(--line2); background: var(--card2); font: 500 19px/1.5 var(--serif); }
+.opt .n { font: 800 15px Manrope, sans-serif; color: var(--muted); flex: none; width: 22px; }
+.opt.sel { border-color: var(--accent); background: rgba(157,140,255,.13); }
+.opt.ok { border-color: var(--ok); background: rgba(95,211,162,.12); }
+.opt.miss { border-color: var(--ok); border-style: dashed; }
+.opt.bad { border-color: var(--bad); background: rgba(239,107,107,.12); }
+.opt .why { display: block; font: 600 14px/1.45 Manrope, sans-serif; margin-top: 4px; color: var(--text2); }
+.opt .why.g { color: var(--ok); } .opt .why.r { color: var(--bad); }
+.opt.locked { cursor: default; }
+.ans { display: flex; gap: 12px; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; flex-wrap: wrap; }
+.ans input { width: 240px; max-width: 100%; padding: 11px 16px; border-radius: 13px; border: 2px solid var(--line2); background: var(--card2); font-size: 21px; font-weight: 800; letter-spacing: .1em; text-align: center; text-transform: uppercase; outline: none; }
+.ans input:focus { border-color: var(--accent); }
+.fb { margin-top: 18px; padding: 14px 18px; border-radius: 14px; font-weight: 700; }
+.fb.ok { background: rgba(95,211,162,.12); color: var(--ok); }
+.fb.bad { background: rgba(239,107,107,.12); color: var(--bad); }
+.fb .ex { color: var(--text2); font-weight: 600; margin-top: 6px; font-size: 15px; line-height: 1.55; }
+.u { text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 4px; }
+.cap { font-weight: 700; letter-spacing: .02em; }
+.rev { display: flex; flex-direction: column; gap: 8px; margin: 18px 0; }
+.rev div { padding: 10px 14px; border-radius: 12px; border: 1px solid var(--ok); font-size: 15px; display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.rev div.bad { border-color: var(--bad); background: rgba(239,107,107,.08); }
+.rev code { font: 800 16px Manrope, sans-serif; letter-spacing: .06em; }
+.rev button { margin-left: auto; border: 1px solid var(--line2); background: var(--card2); border-radius: 9px; padding: 3px 10px; font-weight: 700; font-size: 13px; }
+.res { font-size: 56px; font-weight: 800; text-align: center; line-height: 1.1; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.center { text-align: center; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(80px); background: var(--card3); border: 1px solid var(--line2); padding: 12px 20px; border-radius: 14px; font-weight: 700; transition: transform .25s, opacity .25s; z-index: 9; opacity: 0; }
+.toast.on { transform: translateX(-50%); opacity: 1; }
+footer { margin-top: 30px; color: var(--muted); font-size: 13px; text-align: center; line-height: 1.7; }
+footer button { background: none; border: 0; color: var(--text2); text-decoration: underline; font-size: 13px; padding: 0 4px; }
+@media (max-width: 640px) {
+  .wrap { padding: 16px 16px 50px; }
+  h1 { font-size: 22px; }
+  .hstat { margin-left: 0; width: 100%; justify-content: space-around; }
+  .nums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .num { padding: 12px; }
+  .card { padding: 16px; }
+  .body, .opt { font-size: 17px; }
+  .q { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" href="../">← Моя школа</a>
+    <h1>Прорешка <span>ЕГЭ</span> · русский</h1>
+    <div class="hstat" id="hs"></div>
+  </header>
+  <main id="app"></main>
+  <footer>Задания в формате ЕГЭ 2027 (демоверсия и кодификатор ФИПИ). Прогресс хранится в этом браузере ·
+    <button id="exp">Скачать копию</button> · <button id="imp">Загрузить копию</button> · <button id="reset">Сбросить</button>
+    <input type="file" id="impf" accept=".json" hidden></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- реестр номеров: файлы tasks/tNN.js вызывают REG ----------
+const NAMES = {
+  1: 'Слово на месте пропуска', 2: 'Лексическое значение', 3: 'Характеристика текста', 4: 'Ударения', 5: 'Паронимы',
+  6: 'Лексические нормы', 7: 'Морфологические нормы', 8: 'Синтаксические нормы', 9: 'Корни', 10: 'Приставки',
+  11: 'Суффиксы', 12: 'Окончания глаголов, суффиксы причастий', 13: 'НЕ и НИ', 14: 'Слитно, дефис, раздельно', 15: 'Н и НН',
+  16: 'Однородные члены и ССП', 17: 'Обособленные члены', 18: 'Вводные слова и обращения', 19: 'Запятые в СПП',
+  20: 'Разные виды связи', 21: 'Пунктуационный анализ', 22: 'Средства выразительности', 23: 'Содержание текста',
+  24: 'Типы речи', 25: 'Лексика текста', 26: 'Связь предложений', 27: 'Сочинение',
+};
+const T = {};
+function REG(n, def) { T[n] = def; }
+
+// детерминированный генератор: банк одинаковый при каждом запуске
+function rng(a) { return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const mkShuffle = r => a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+// раздаёт элементы пула по заданиям так, чтобы каждый встречался примерно поровну и без повторов внутри задания
+function dealer(pool, r, key = x => x) {
+  const sh = mkShuffle(r), q = [];
+  return (n, ok = () => true) => { const out = []; let guard = 0; while (out.length < n && guard++ < 50) { if (q.length < n * 3) q.push(...sh(pool)); const i = q.findIndex(x => ok(x, out) && !out.some(y => key(y) === key(x))); if (i < 0) { q.push(...sh(pool)); continue; } out.push(q.splice(i, 1)[0]); } return out; };
+}
+
+// №9–12: ряды слов с пропуском. Верный ряд — во всех словах одна и та же буква.
+// data: { буква: 'слово1; слово2; …' }, groups — какие буквы путают между собой (из них строятся ряды)
+function rowsGen({ seed, data, len, n, q, groups }) {
+  const byL = {};
+  Object.entries(data).forEach(([l, s]) => { byL[l] = s.split(';').map(w => w.trim()).filter(Boolean).map(w => ({ w, l })); });
+  const r = rng(seed), sh = mkShuffle(r), deal = {};
+  Object.keys(byL).forEach(l => deal[l] = dealer(byL[l], r, x => x.w));
+  const gs = (groups || [Object.keys(byL)]).map(g => g.filter(l => byL[l] && byL[l].length >= len + 2)).filter(g => g.length >= 2);
+  const pick = (l, used) => deal[l](1, x => !used.has(x.w))[0] || byL[l].find(x => !used.has(x.w)) || byL[l][0];
+  const show = w => w.replace(/\.\./g, '<span class="gap">..</span>');
+  const fill = x => x.w.replace(/\.\./g, `<b>${x.l}</b>`);
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const nOk = [1, 2, 2, 3, 3, 4][Math.floor(r() * 6)], okSet = new Set(sh([0, 1, 2, 3, 4]).slice(0, nOk)), used = new Set(), order = sh(gs);
+    const rows = [0, 1, 2, 3, 4].map(j => {
+      const g = order[j % order.length];
+      let ls;
+      if (okSet.has(j)) { const l = g[Math.floor(r() * g.length)]; ls = Array(len).fill(l); }
+      else { const two = sh(g).slice(0, 2); ls = sh([...two, ...Array.from({ length: len - 2 }, () => g[Math.floor(r() * g.length)])]); }
+      const ws = ls.map(l => { const x = pick(l, used); used.add(x.w); return x; });
+      return { h: ws.map(x => show(x.w)).join(', '), ok: okSet.has(j), why: ws.map(fill).join(', ') };
+    });
+    out.push({ q, opts: rows });
+  }
+  return out;
+}
+
+// ---------- состояние ----------
+const KEY = 'proreshka-v1';
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+const plural = (n, a, b, c) => { const m = Math.abs(n) % 100, k = m % 10; return m > 10 && m < 20 ? c : k === 1 ? a : k > 1 && k < 5 ? b : c; };
+const norm = s => Object.assign({ d: {}, vars: [], days: {} }, s);
+function load() { try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.d) return norm(s); } catch (e) { } return norm({}); }
+let S = load();
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } };
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2200); }
+
+const BANKS = {};
+const bank = n => BANKS[n] || (BANKS[n] = T[n].gen());
+const rec = n => S.d[n] || (S.d[n] = {});
+function numStat(n) { const r = S.d[n] || {}, v = Object.values(r); return { solved: v.length, ok: v.filter(x => x.ok).length }; }
+
+// ---------- проверка ответа ----------
+const clean = s => String(s).toLowerCase().replace(/ё/g, 'е').replace(/[\s,.;]/g, '');
+const ansOf = t => t.ans != null ? String(t.ans) : t.opts.map((o, i) => o.ok ? i + 1 : '').join('');
+function isRight(t, a) {
+  if (t.kind === 'word') return [t.ans, ...(t.alt || [])].some(x => clean(x) === clean(a));
+  if (t.kind === 'seq') return clean(a) === clean(ansOf(t));
+  const set = x => [...new Set(clean(x).split(''))].sort().join('');
+  return !!clean(a) && set(a) === set(ansOf(t));
+}
+
+function renderHs() {
+  const all = Object.keys(T).map(numStat), solved = all.reduce((s, x) => s + x.solved, 0), ok = all.reduce((s, x) => s + x.ok, 0);
+  const td = S.days[today()] || 0;
+  $('#hs').innerHTML = `<div><b>${solved}</b><span>решено заданий</span></div><div><b>${solved ? Math.round(ok / solved * 100) + '%' : '—'}</b><span>на балл</span></div><div><b>${td}</b><span>сегодня</span></div>`;
+}
+
+// ---------- главная: 27 номеров ----------
+function drawHome() {
+  const ready = Object.keys(T).map(Number), lastVar = S.vars[S.vars.length - 1];
+  $('#app').innerHTML = `<div class="big">
+      <div class="card"><div class="ct">Вариант целиком <span>по одному заданию каждого готового номера, проверка в конце</span></div>
+        <div class="btns l" style="margin:0"><button class="btn" data-go="var">Решать вариант (${ready.length} ${plural(ready.length, 'задание', 'задания', 'заданий')})</button></div>
+        ${lastVar ? `<div class="hint" style="margin-top:10px">Последний: ${lastVar.ok} из ${lastVar.n} · ${new Date(lastVar.d + 'T12:00').toLocaleDateString('ru')}</div>` : ''}</div>
+      <div class="card"><div class="ct">Слабые места</div>${weakest()}</div>
+    </div>
+    <div class="nums">${Object.keys(NAMES).map(Number).map(n => {
+      if (!T[n]) return `<div class="num off"><span class="n">${n}</span><span class="t">${NAMES[n]}</span><small>скоро</small></div>`;
+      const st = numStat(n), N = bank(n).length;
+      return `<button class="num" data-go="t${n}"><span class="n">${n}</span><span class="t">${NAMES[n]}</span><small>${st.solved ? `${st.solved} из ${N} · ${Math.round(st.ok / st.solved * 100)}% на балл` : `${N} ${plural(N, 'задание', 'задания', 'заданий')}`}</small>
+        <span class="bar"><i style="width:${st.ok / N * 100}%;background:var(--ok)"></i><i style="width:${(st.solved - st.ok) / N * 100}%;background:var(--bad)"></i></span></button>`;
+    }).join('')}</div>`;
+}
+function weakest() {
+  const w = Object.keys(T).map(n => ({ n, ...numStat(n) })).filter(x => x.solved >= 3).sort((a, b) => a.ok / a.solved - b.ok / b.solved).slice(0, 3);
+  if (!w.length) return '<div class="hint">Реши хотя бы по 3 задания в номерах — здесь появятся номера, где больше всего ошибок.</div>';
+  return w.map(x => `<div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:6px"><a href="#t${x.n}" style="font-weight:700;text-decoration:none">№${x.n} · ${NAMES[x.n]}</a><b style="color:${x.ok / x.solved < .7 ? 'var(--bad)' : 'var(--ok)'}">${Math.round(x.ok / x.solved * 100)}%</b></div>`).join('');
+}
+
+// ---------- банк номера ----------
+function drawBank(n) {
+  const B = bank(n), r = S.d[n] || {}, st = numStat(n);
+  $('#app').innerHTML = `<div class="big">
+      <div class="card kpi"><b>${st.solved} / ${B.length}</b><span>прорешано в №${n}</span></div>
+      <div class="card kpi"><b>${st.ok}</b><span>на балл${st.solved ? ' · ' + Math.round(st.ok / st.solved * 100) + '%' : ''}</span></div>
+      <div class="card kpi"><b>${st.solved - st.ok}</b><span>с ошибкой — перерешай</span></div></div>
+    <div class="card"><div class="ct">№${n}. ${NAMES[n]} <span>${T[n].note || 'нажми на номер — откроется задание'}</span></div>
+      <div class="btns l"><button class="btn" data-act="next">${st.solved < B.length ? 'Решать нерешённые подряд' : 'Всё решено — пройти заново'}</button>${st.solved - st.ok ? `<button class="btn red" data-act="redo">Перерешать ошибки (${st.solved - st.ok})</button>` : ''}<button class="btn ghost" data-go="">← Все номера</button></div>
+      <div class="bank">${B.map((_, i) => { const x = r[i + 1]; return `<button class="${x ? (x.ok ? 'ok' : 'bad') : ''}" data-task="${i + 1}">${i + 1}</button>`; }).join('')}</div></div>`;
+}
+
+// ---------- решение: серия заданий (из банка или вариант) ----------
+let P = null;
+function startRun(items, mode) { if (!items.length) return toast('Нечего решать'); P = { items, mode, i: 0, sel: new Set(), done: false, res: [], ans: [] }; drawTask(); }
+const cur = () => P.items[P.i];
+function drawTask() {
+  if (P.i >= P.items.length) return drawEnd();
+  const { n, k } = cur(), t = bank(n)[k - 1], prev = (S.d[n] || {})[k], isVar = P.mode === 'var';
+  const opts = t.opts ? `<div class="opts">${t.opts.map((o, i) => {
+    let c = P.sel.has(i + 1) ? 'sel' : '', why = '';
+    if (P.done) { const s = P.sel.has(i + 1); c = (o.ok && s ? 'ok' : o.ok ? 'miss' : s ? 'bad' : '') + ' locked'; if (o.why) why = `<span class="why ${o.ok ? 'g' : 'r'}">${o.why}</span>`; }
+    return `<button class="opt ${c}" data-o="${i + 1}"><span class="n">${i + 1})</span><span>${o.h}${why}</span></button>`; }).join('')}</div>` : '';
+  const a = P.ans[P.i] ?? [...P.sel].sort().join('');
+  $('#app').innerHTML = `<div class="card task">
+    ${P.items.length > 1 ? `<div class="prog">${P.items.map((_, i) => `<i class="${i < P.i ? (isVar ? 'done' : P.res[i] ? 'ok' : 'bad') : i === P.i ? 'cur' : ''}"></i>`).join('')}</div>` : ''}
+    <div class="hint">${isVar ? `Вариант · задание ${P.i + 1} из ${P.items.length}` : `№${n} · задание ${k} из ${bank(n).length}`}${prev && !P.done && !isVar ? (prev.ok ? ' · раньше решено верно' : ' · раньше была ошибка') : ''}</div>
+    <div class="q"><b class="no">${n}</b>${t.q}</div>
+    ${t.body ? `<div class="body">${t.body}</div>` : ''}${opts}
+    <div class="ans">Ответ: <input id="ai" autocomplete="off" spellcheck="false" ${t.kind === 'word' ? '' : 'inputmode="numeric"'} value="${a}" ${P.done ? 'disabled' : ''}></div>
+    ${P.done ? `<div class="fb ${P.res[P.i] ? 'ok' : 'bad'}">${P.res[P.i] ? 'Верно — балл!' : `Неверно. Правильный ответ: ${ansText(t)}`}${t.why ? `<div class="ex">${t.why}</div>` : ''}</div>
+      <div class="btns"><button class="btn" id="nx">${P.i + 1 < P.items.length ? 'Дальше →' : 'Готово'}</button><button class="btn ghost" data-go="t${n}">К банку №${n}</button></div>`
+      : `<div class="btns"><button class="btn" id="ck">${isVar ? (P.i + 1 < P.items.length ? 'Ответить →' : 'Завершить вариант') : 'Проверить'}</button>${isVar && P.i ? '<button class="btn ghost" id="pv">← Назад</button>' : ''}</div>
+      <div class="hint center" style="margin-top:10px">${t.opts ? 'нажимай на варианты или вводи цифры · ' : ''}Enter — ${isVar ? 'ответить' : 'проверить'}</div>`}</div>`;
+  if (!P.done && !t.opts) $('#ai').focus();
+}
+const ansText = t => t.kind === 'word' ? [t.ans, ...(t.alt || [])].map(x => x.toUpperCase()).join(' или ') : ansOf(t);
+function check() {
+  const { n, k } = cur(), t = bank(n)[k - 1], a = $('#ai').value.trim();
+  if (!a && !confirm('Ответ пустой. Засчитать как пропуск?')) return;
+  const ok = isRight(t, a), prev = rec(n)[k];
+  rec(n)[k] = { ok: ok ? 1 : 0, a, c: (prev ? prev.c : 0) + 1, d: today() };
+  S.days[today()] = (S.days[today()] || 0) + 1;
+  P.res[P.i] = ok; P.ans[P.i] = a; save(); renderHs();
+  if (P.mode === 'var') { P.i++; P.sel = new Set(); drawTask(); } else { P.done = true; drawTask(); }
+}
+function next() { P.i++; P.sel = new Set(); P.done = false; P.items.length === 1 ? go('t' + cur0().n) : drawTask(); }
+const cur0 = () => P.items[0];
+function drawEnd() {
+  const ok = P.res.filter(Boolean).length, n = P.items.length;
+  if (P.mode === 'var' && !P.saved) { S.vars.push({ d: today(), ok, n }); P.saved = 1; save(); }
+  $('#app').innerHTML = `<div class="card task"><div class="hint center">${P.mode === 'var' ? 'Вариант решён' : 'Серия решена'}</div><div class="res">${ok} / ${n}</div>
+    <div class="hint center" style="margin-top:6px">${ok === n ? 'Всё на балл 🎉' : 'Нажми «разбор», чтобы открыть задание с объяснением'}</div>
+    <div class="rev">${P.items.map(({ n, k }, i) => { const t = bank(n)[k - 1]; return `<div class="${P.res[i] ? '' : 'bad'}"><b>№${n}</b> твой ответ: <code>${P.ans[i] || '—'}</code>${P.res[i] ? ' ✓' : ` · верный: <code>${ansText(t)}</code>`}<button data-rv="${i}">разбор</button></div>`; }).join('')}</div>
+    <div class="btns">${P.mode === 'var' ? '<button class="btn" data-go="var">Новый вариант</button>' : ''}<button class="btn ghost" data-go="">Все номера</button></div></div>`;
+}
+// разбор задания из итогов варианта
+function review(i) { const it = P.items[i]; const keep = P; P = { items: [it], mode: 'rev', i: 0, sel: new Set([...(keep.ans[i] || '')].map(Number).filter(Boolean)), done: true, res: [keep.res[i]], ans: [keep.ans[i] || ''], back: keep }; drawTask(); $('#nx').textContent = '← К итогам'; }
+
+function startVar() {
+  const r = Math.random, items = Object.keys(T).map(Number).sort((a, b) => a - b).map(n => { const B = bank(n), r0 = S.d[n] || {}, fresh = B.map((_, i) => i + 1).filter(k => !r0[k]); const pool = fresh.length ? fresh : B.map((_, i) => i + 1); return { n, k: pool[Math.floor(r() * pool.length)] }; });
+  startRun(items, 'var');
+}
+
+// ---------- навигация ----------
+function go(h) { location.hash = h; if (('#' + h) === location.hash) route(); }
+function route() {
+  const h = location.hash.slice(1); P = null;
+  if (h === 'var') startVar();
+  else if (/^t\d+$/.test(h) && T[h.slice(1)]) drawBank(+h.slice(1));
+  else drawHome();
+  renderHs(); window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+$('#app').addEventListener('click', e => {
+  const b = e.target.closest('button,[data-go]'); if (!b) return;
+  if (b.dataset.go != null) { if (location.hash.slice(1) === b.dataset.go) route(); else location.hash = b.dataset.go; return; }
+  const n = +location.hash.slice(2);
+  if (b.dataset.task) startRun([{ n, k: +b.dataset.task }], 'bank');
+  if (b.dataset.act === 'next') { const B = bank(n), r = S.d[n] || {}, u = B.map((_, i) => i + 1).filter(k => !r[k]); startRun((u.length ? u : B.map((_, i) => i + 1)).map(k => ({ n, k })), 'bank'); }
+  if (b.dataset.act === 'redo') startRun(Object.keys(S.d[n] || {}).filter(k => !S.d[n][k].ok).map(Number).sort((a, c) => a - c).map(k => ({ n, k })), 'bank');
+  if (b.dataset.o && P && !P.done) { const o = +b.dataset.o; P.sel.has(o) ? P.sel.delete(o) : P.sel.add(o); P.ans[P.i] = undefined; drawTask(); }
+  if (b.id === 'ck') check();
+  if (b.id === 'pv') { P.i--; P.sel = new Set([...(P.ans[P.i] || '')].map(Number).filter(Boolean)); P.ans[P.i] = P.ans[P.i]; drawTask(); }
+  if (b.id === 'nx') { if (P.mode === 'rev') { P = P.back; drawEnd(); } else next(); }
+  if (b.dataset.rv) review(+b.dataset.rv);
+});
+$('#app').addEventListener('input', e => {
+  if (e.target.id !== 'ai' || !P || P.done) return;
+  const t = bank(cur().n)[cur().k - 1];
+  if (t.opts) { P.sel = new Set([...e.target.value].map(Number).filter(x => x >= 1 && x <= t.opts.length)); $$('.opt').forEach(el => el.classList.toggle('sel', P.sel.has(+el.dataset.o))); }
+  P.ans[P.i] = e.target.value;
+});
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if ($('#ck')) { e.preventDefault(); check(); } else if ($('#nx')) { e.preventDefault(); $('#nx').click(); }
+});
+$('#reset').onclick = () => { if (confirm('Сбросить весь прогресс прорешки?')) { S = norm({}); save(); route(); toast('Прогресс сброшен'); } };
+$('#exp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(S)], { type: 'application/json' })); a.download = `proreshka-${today()}.json`; a.click(); toast('Копия скачана'); };
+$('#imp').onclick = () => $('#impf').click();
+$('#impf').onchange = e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { try { const s = JSON.parse(t); if (!s.d) throw 0; S = norm(s); save(); route(); toast('Прогресс загружен'); } catch (er) { toast('Это не файл прорешки'); } }); e.target.value = ''; };
+</script>
+<script src="tasks/t04.js"></script>
+<script src="tasks/t05.js"></script>
+<script src="tasks/t09.js"></script>
+<script src="tasks/t10.js"></script>
+<script src="tasks/t11.js"></script>
+<script src="tasks/t12.js"></script>
+<script src="tasks/t13.js"></script>
+<script src="tasks/t14.js"></script>
+<script src="tasks/t15.js"></script>
+<script>route();</script>
+</body>
+</html>
