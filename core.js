@@ -51,6 +51,12 @@ function load() {
 let S = load();
 // 24.10: 05.10 и 08.10 по математике досмотрены только наполовину — снять старую стартовую отметку (свою отметку не трогаем)
 if (!S.fix24) { for (const id of ['m-2026-10-05', 'm-2026-10-08']) if (S.les[id] && S.les[id].hw === 'old') delete S.les[id]; S.fix24 = 1; save(); }
+// 25.10: стартовый пробник по русскому (демоверсия 2027, решён за 28 мин, сочинение не проверено) — в «Пробники»
+if (!S.fix25) {
+  if (!S.tests.some(t => t.subj === 'r' && t.date === '2026-10-25'))
+    S.tests.push({ id: 'start-r', subj: 'r', date: '2026-10-25', src: 'Демоверсия ЕГЭ-2027, старт (без сочинения)', score: 13, max: 59, test: '', wrong: [], full: false });
+  S.fix25 = 1; save();
+}
 let saveWarned = false;
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(S)); }
